@@ -1,0 +1,47 @@
+name: Deploy Website
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1
+
+      - name: Verify AWS Connection
+        run: |
+          echo "AWS Authentication Successful"
+          aws sts get-caller-identity
+
+      - name: Display Repository Files
+        run: |
+          echo "Current Repository Files:"
+          ls -la
+
+      - name: Build Docker Image
+        run: |
+          docker build -t kamm-app .
+
+      - name: List Docker Images
+        run: |
+          docker images
+
+      - name: Workflow Completed
+        run: |
+          echo "===================================="
+          echo "CI Pipeline Executed Successfully"
+          echo "Docker Image Built Successfully"
+          echo "Ready for Deployment to EC2"
+          echo "===================================="
